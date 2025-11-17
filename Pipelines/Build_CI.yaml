@@ -1,0 +1,31 @@
+name: 1.0$(rev:.r) # build numbering format
+
+variables:
+  BuildConfiguration: "Release"
+  SolutionName: "TimeBuddy.sln"
+  ReSharperSettingsFileName: "CISettings_NonNuGet.DotSettings"
+  ApplicationSubPath: "Wb.TimeBuddy" # Use the Repository name here
+
+resources:
+  repositories:
+    - repository: ALMStuff
+      type: github
+      name: DrMueller/ALMStuff
+      ref: refs/heads/master
+      endpoint: GitHub-DrMueller
+
+jobs:
+  - job: "BuildAndTest"
+    displayName: "Build and test"
+    pool:
+      name: Azure Pipelines
+      vmImage: windows-2022
+    steps:
+      - checkout: self
+      - checkout: ALMStuff
+      - template: AzureDevOps/BuildTemplates/NetCore/Steps/Initialize_And_Test.yaml@ALMStuff
+        parameters:
+          BuildConfiguration: $(BuildConfiguration)
+          SolutionName: $(SolutionName)
+          ApplicationSubPath: $(ApplicationSubPath)
+          ReSharperSettingsFileName: $(ReSharperSettingsFileName)
